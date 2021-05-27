@@ -50,8 +50,8 @@ const keyCodes = {
 	tab: 9
 };
 
-export default class Task extends React.Component {
-	onKeyDown = (event, provided, snapshot) => {
+const Task = (props) => {
+	const onKeyDown = (event, provided, snapshot) => {
 		if (provided.dragHandleProps) {
 			provided.dragHandleProps.onKeyDown(event);
 		}
@@ -71,12 +71,12 @@ export default class Task extends React.Component {
 		// we are using the event for selection
 		event.preventDefault();
 
-		this.performAction(event);
+		performAction(event);
 	};
 
 	// Using onClick as it will be correctly
 	// preventing if there was a drag
-	onClick = (event) => {
+	const onClick = (event) => {
 		// console.log("onClick event called");
 		if (event.defaultPrevented) {
 			return;
@@ -89,10 +89,10 @@ export default class Task extends React.Component {
 		// marking the event as used
 		event.preventDefault();
 
-		this.performAction(event);
+		performAction(event);
 	};
 
-	onTouchEnd = (event) => {
+	const onTouchEnd = (event) => {
 		if (event.defaultPrevented) {
 			return;
 		}
@@ -101,92 +101,92 @@ export default class Task extends React.Component {
 		// we would also need to add some extra logic to prevent the click
 		// if this element was an anchor
 		event.preventDefault();
-		this.props.toggleSelectionInGroup(this.props.task.id);
+		props.toggleSelectionInGroup(props.task.id);
 	};
 
 	// Determines if the platform specific toggle selection in group key was used
-	wasToggleInSelectionGroupKeyUsed = (event) => {
+	const wasToggleInSelectionGroupKeyUsed = (event) => {
 		const isUsingWindows = navigator.platform.indexOf('Win') >= 0;
 		return isUsingWindows ? event.ctrlKey : event.metaKey;
 	};
 
 	// Determines if the multiSelect key was used
-	wasMultiSelectKeyUsed = (event) => event.shiftKey;
+	const wasMultiSelectKeyUsed = (event) => event.shiftKey;
 
-	performAction = (event) => {
+	const performAction = (event) => {
 		// console.log("OnClick performAction called");
-		const { task, toggleSelection, toggleSelectionInGroup, multiSelectTo } = this.props;
+		const { task, toggleSelection, toggleSelectionInGroup, multiSelectTo } = props;
 
-		if (this.wasToggleInSelectionGroupKeyUsed(event)) {
+		if (wasToggleInSelectionGroupKeyUsed(event)) {
 			toggleSelectionInGroup(task.id);
 			return;
 		}
 
-		if (this.wasMultiSelectKeyUsed(event)) {
+		if (wasMultiSelectKeyUsed(event)) {
 			multiSelectTo(task.id);
 			return;
 		}
-		console.log({ props: this.props });
+		console.log({ props: props });
 		toggleSelection(task.id);
 	};
 
-	taskName = this.props.task.content;
-	id = this.props.task.id;
+	const taskName = props.task.content;
+	const id = props.task.id;
 
-	render() {
-		// console.log("Task - Rendering");
-		const isSelected = this.props.isSelected;
-		const selectionCount = this.props.selectionCount;
-		const disAppearTask = this.props.disAppearTask;
+	// console.log("Task - Rendering");
+	const isSelected = props.isSelected;
+	const selectionCount = props.selectionCount;
+	const disAppearTask = props.disAppearTask;
 
-		const getStyle = (style, snapshot) => {
-			if (!snapshot.isDropAnimating) {
-				return {
-					...style,
-					width: snapshot.isDragging ? '200px' : '600px',
-					opacity: snapshot.isDragging ? '0.6' : '1',
-					shadow: '10px 10px grey'
-				};
-			}
+	const getStyle = (style, snapshot) => {
+		if (!snapshot.isDropAnimating) {
 			return {
 				...style,
-				// cannot be 0, but make it super tiny
-				transitionDuration: `0.50s`
+				width: snapshot.isDragging ? '200px' : '600px',
+				opacity: snapshot.isDragging ? '0.6' : '1',
+				shadow: '10px 10px grey'
 			};
+		}
+		return {
+			...style,
+			// cannot be 0, but make it super tiny
+			transitionDuration: `0.50s`
 		};
+	};
 
-		// const isSelected = this.props.isSelected;
+	// const isSelected = props.isSelected;
 
-		return (
-			<Draggable draggableId={this.props.task.id} index={this.props.index} onKeyDown={this.onKeyDown}>
-				{(provided, snapshot) => {
-					const shouldShowSelection = snapshot.isDragging && selectionCount > 1;
-					if (disAppearTask) {
-						// console.log(
-						//   "Task id - " + this.id + "diappear flag - " + disAppearTask
-						// );
-						return null;
-					}
-					// console.log("Task - Draggable Rendering");
+	return (
+		<Draggable draggableId={props.task.id} index={props.index} onKeyDown={onKeyDown}>
+			{(provided, snapshot) => {
+				const shouldShowSelection = snapshot.isDragging && selectionCount > 1;
+				if (disAppearTask) {
+					// console.log(
+					//   "Task id - " + id + "diappear flag - " + disAppearTask
+					// );
+					return null;
+				}
+				// console.log("Task - Draggable Rendering");
 
-					return (
-						<Container
-							{...provided.draggableProps}
-							{...provided.dragHandleProps}
-							ref={provided.innerRef}
-							isDragging={snapshot.isDragging}
-							onClick={this.onClick}
-							onTouchEnd={this.onTouchEnd}
-							onKeyDown={(event) => this.onKeyDown(event, provided, snapshot)}
-							isSelected={isSelected}
-							style={getStyle(provided.draggableProps.style, snapshot)}
-						>
-							{snapshot.isDragging ? this.taskName + ' - Moving' : this.taskName}
-							{shouldShowSelection ? <SelectionCount>{selectionCount}</SelectionCount> : null}
-						</Container>
-					);
-				}}
-			</Draggable>
-		);
-	}
-}
+				return (
+					<Container
+						{...provided.draggableProps}
+						{...provided.dragHandleProps}
+						ref={provided.innerRef}
+						isDragging={snapshot.isDragging}
+						onClick={onClick}
+						onTouchEnd={onTouchEnd}
+						onKeyDown={(event) => onKeyDown(event, provided, snapshot)}
+						isSelected={isSelected}
+						style={getStyle(provided.draggableProps.style, snapshot)}
+					>
+						{snapshot.isDragging ? taskName + ' - Moving' : taskName}
+						{shouldShowSelection ? <SelectionCount>{selectionCount}</SelectionCount> : null}
+					</Container>
+				);
+			}}
+		</Draggable>
+	);
+};
+
+export default Task;

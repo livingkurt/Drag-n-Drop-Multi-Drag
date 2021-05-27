@@ -23,54 +23,49 @@ const getSelectedMap = memoizeOne((selectedTaskIds) =>
 	}, {})
 );
 
-export default class Column extends React.Component {
-	render() {
-		// console.log("Column - Droppable");
-		const selectedTaskIds = this.props.selectedTaskIds;
-		const draggingTaskId = this.props.draggingTaskId;
+const Column = (props) => {
+	// console.log("Column - Droppable");
+	const selectedTaskIds = props.selectedTaskIds;
+	const draggingTaskId = props.draggingTaskId;
 
-		return (
-			<Container>
-				<Title>{this.props.column.title}</Title>
-				<Droppable droppableId={this.props.column.id}>
-					{(provided, snapshot) => (
-						<TaskList
-							ref={provided.innerRef}
-							isDraggingOver={snapshot.isDraggingOver}
-							{...provided.droppableProps}
-						>
-							{this.props.tasks.map((task, index) => {
-								const isSelected = Boolean(getSelectedMap(selectedTaskIds)[task.id]);
-								let disAppearTask = false;
-								if (
-									snapshot.isDraggingOver &&
-									isSelected &&
-									draggingTaskId &&
-									task.id !== draggingTaskId
-								) {
-									// console.log("Dragging Over - Task not to render - " + task.id);
-									// console.log("draggingTaskId - " + draggingTaskId);
-									disAppearTask = true;
-								}
-								return (
-									<Task
-										key={task.id}
-										task={task}
-										index={index}
-										isSelected={isSelected}
-										selectionCount={selectedTaskIds.length}
-										toggleSelection={this.props.toggleSelection}
-										toggleSelectionInGroup={this.props.toggleSelectionInGroup}
-										multiSelectTo={this.props.multiSelectTo}
-										disAppearTask={disAppearTask}
-									/>
-								);
-							})}
-							{provided.placeholder}
-						</TaskList>
-					)}
-				</Droppable>
-			</Container>
-		);
-	}
-}
+	return (
+		<Container>
+			<Title>{props.column.title}</Title>
+			<Droppable droppableId={props.column.id}>
+				{(provided, snapshot) => (
+					<TaskList
+						ref={provided.innerRef}
+						isDraggingOver={snapshot.isDraggingOver}
+						{...provided.droppableProps}
+					>
+						{props.tasks.map((task, index) => {
+							const isSelected = Boolean(getSelectedMap(selectedTaskIds)[task.id]);
+							let disAppearTask = false;
+							if (snapshot.isDraggingOver && isSelected && draggingTaskId && task.id !== draggingTaskId) {
+								// console.log("Dragging Over - Task not to render - " + task.id);
+								// console.log("draggingTaskId - " + draggingTaskId);
+								disAppearTask = true;
+							}
+							return (
+								<Task
+									key={task.id}
+									task={task}
+									index={index}
+									isSelected={isSelected}
+									selectionCount={selectedTaskIds.length}
+									toggleSelection={props.toggleSelection}
+									toggleSelectionInGroup={props.toggleSelectionInGroup}
+									multiSelectTo={props.multiSelectTo}
+									disAppearTask={disAppearTask}
+								/>
+							);
+						})}
+						{provided.placeholder}
+					</TaskList>
+				)}
+			</Droppable>
+		</Container>
+	);
+};
+
+export default Column;
